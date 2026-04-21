@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badminton Hub Pro - バドミントン上達支援</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #f0f4f8;
+        }
+
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .nav-active {
+            border-bottom: 3px solid #10b981;
+            color: #10b981;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 9999px;
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-emerald-600 text-white py-8 px-4 shadow-lg text-center">
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">
+            <i class="fas fa-shuttlecock mr-2"></i>Badminton Hub Pro
+        </h1>
+        <p class="text-emerald-100 opacity-90">戦略と情熱でコートを支配する</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-white sticky top-0 z-50 shadow-sm overflow-x-auto border-b border-gray-200">
+        <div class="flex justify-center min-w-max px-4">
+            <button onclick="switchTab('home')" id="btn-home" class="nav-btn px-6 py-4 font-bold text-gray-600 hover:text-emerald-600 transition-colors nav-active">
+                ホーム
+            </button>
+            <button onclick="switchTab('practice')" id="btn-practice" class="nav-btn px-6 py-4 font-bold text-gray-600 hover:text-emerald-600 transition-colors">
+                練習ログ
+            </button>
+            <button onclick="switchTab('tips')" id="btn-tips" class="nav-btn px-6 py-4 font-bold text-gray-600 hover:text-emerald-600 transition-colors">
+                上達のヒント
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto max-w-3xl px-4 py-8 flex-grow">
+        
+        <!-- Home Tab -->
+        <section id="home" class="tab-content active bg-white rounded-2xl shadow-md overflow-hidden">
+            <div class="h-48 bg-gradient-to-r from-emerald-400 to-teal-500 flex items-center justify-center text-white">
+                <i class="fas fa-medal text-6xl opacity-50"></i>
+            </div>
+            <div class="p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">バドミントンの魅力</h2>
+                <p class="text-gray-600 leading-relaxed mb-6">
+                    バドミントンは、時速400kmを超えるシャトルが飛び交う、世界で最もダイナミックなスポーツの一つです。
+                    単なる体力勝負ではなく、チェスのような高度な戦術、そして相手の裏をかく繊細なラケットワークが魅力です。
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                        <h3 class="font-bold text-emerald-800 mb-2"><i class="fas fa-bolt mr-2"></i>スピード</h3>
+                        <p class="text-sm text-emerald-700">反応速度と瞬発力が勝利の鍵となります。</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <h3 class="font-bold text-blue-800 mb-2"><i class="fas fa-brain mr-2"></i>タクティクス</h3>
+                        <p class="text-sm text-blue-700">相手の弱点を見抜き、ショットを配球します。</p>
+                    </div>
+                </div>
+                <button onclick="openModal()" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 transition-all">
+                    今日のワンポイントを見る
+                </button>
+            </div>
+        </section>
+
+        <!-- Practice Tab -->
+        <section id="practice" class="tab-content bg-white rounded-2xl shadow-md p-6 md:p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">練習目標トラッカー</h2>
+            <p class="text-gray-500 mb-6 text-sm">日々の小さな積み重ねが、大きな成長を生みます。</p>
+            
+            <div class="space-y-6">
+                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">今日の練習目標を設定</label>
+                    <div class="flex flex-col md:flex-row gap-2">
+                        <input type="text" id="goalInput" placeholder="例：ハイバックを20回連続で入れる" 
+                               class="flex-grow p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <button onclick="saveGoal()" class="bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-700 transition-all">
+                            保存
+                        </button>
+                    </div>
+                </div>
+
+                <div class="border-t pt-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-bullseye text-red-500 mr-2"></i>現在の目標
+                    </h3>
+                    <div id="goalDisplayContainer" class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-xl">
+                        <p id="goalDisplay" class="text-yellow-800 italic text-lg">目標がまだ設定されていません</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tips Tab -->
+        <section id="tips" class="tab-content bg-white rounded-2xl shadow-md p-6 md:p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">基本テクニックの極意</h2>
+            <div class="space-y-4">
+                <div class="group border-b pb-4">
+                    <h3 class="font-bold text-gray-800 flex items-center text-lg mb-1 group-hover:text-emerald-600">
+                        <span class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mr-3 text-sm">1</span>
+                        オーバーヘッドストローク
+                    </h3>
+                    <p class="text-gray-600 ml-11 text-sm leading-relaxed">
+                        「半身の構え」を徹底しましょう。ラケットを振るのではなく、体全体の回転（ボディターン）を使ってシャトルを飛ばします。
+                    </p>
+                </div>
+                <div class="group border-b pb-4">
+                    <h3 class="font-bold text-gray-800 flex items-center text-lg mb-1 group-hover:text-emerald-600">
+                        <span class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mr-3 text-sm">2</span>
+                        フットワークの基礎
+                    </h3>
+                    <p class="text-gray-600 ml-11 text-sm leading-relaxed">
+                        常に「リアクションステップ（プレジャンプ）」を意識。着地と同時に相手のショットに反応し、最初の一歩を素早く出します。
+                    </p>
+                </div>
+                <div class="group border-b pb-4">
+                    <h3 class="font-bold text-gray-800 flex items-center text-lg mb-1 group-hover:text-emerald-600">
+                        <span class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mr-3 text-sm">3</span>
+                        ヘアピンとドロップ
+                    </h3>
+                    <p class="text-gray-600 ml-11 text-sm leading-relaxed">
+                        「タッチは優しく」が鉄則。腕を振るのではなく、ラケットの面をシャトルの下に滑り込ませるようなイメージでコントロールします。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-[60] px-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl transform transition-all scale-100">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-lightbulb text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">上達のワンポイント</h3>
+                <p class="text-gray-600 mb-6 leading-relaxed">
+                    「シャトルを打つ瞬間まで、相手の動きをしっかり見る」ことを意識しましょう。これだけでミスが劇的に減り、配球が良くなります！
+                </p>
+                <button onclick="closeModal()" class="w-full bg-gray-100 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-200 transition-all">
+                    閉じる
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast shadow-lg"></div>
+
+    <footer class="text-center py-6 text-gray-500 text-xs">
+        &copy; 2024 Badminton Hub Pro. All rights reserved.
+    </footer>
+
+    <script>
+        // タブ切り替え
+        function switchTab(tabId) {
+            // 全タブコンテンツを非表示に
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 対象タブを表示
+            const activeTab = document.getElementById(tabId);
+            activeTab.classList.add('active');
+
+            // ナビゲーションのスタイル更新
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('nav-active');
+            });
+            document.getElementById('btn-' + tabId).classList.add('nav-active');
+
+            // ページ最上部へスクロール（モバイル用）
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 目標の保存
+        function saveGoal() {
+            const goalInput = document.getElementById('goalInput');
+            const goal = goalInput.value.trim();
+            
+            if (!goal) {
+                showToast('目標を入力してください');
+                return;
+            }
+
+            localStorage.setItem('badmintonGoalPro', goal);
+            updateGoalDisplay(goal);
+            goalInput.value = '';
+            showToast('目標を保存しました！');
+        }
+
+        // 目標表示の更新
+        function updateGoalDisplay(goal) {
+            const display = document.getElementById('goalDisplay');
+            if (goal) {
+                display.innerText = goal;
+                display.classList.remove('italic', 'text-gray-400');
+                display.classList.add('text-yellow-900', 'font-bold');
+            } else {
+                display.innerText = '目標がまだ設定されていません';
+            }
+        }
+
+        // トースト通知
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // モーダル操作
+        function openModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // 初期化
+        window.onload = () => {
+            const savedGoal = localStorage.getItem('badmintonGoalPro');
+            if (savedGoal) {
+                updateGoalDisplay(savedGoal);
+            }
+        };
+
+        // 背景クリックでモーダルを閉じる
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
